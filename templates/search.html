@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Discover{% endblock %}
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+<script>
+	if ( window.history.replaceState ) {
+              window.history.replaceState( null, null, window.location.href );
+            }
+</script>
+
+<div class="jumbotron" style="height:920px">
+	{% if not found_users_list %}
+		<br><br><br><br><br>
+		<h1 style="text-align:center">No users found... please try again</h1>
+	{% else %}
+		{% for user,picture,date,situation in found_users_list %}
+			{% if situation == "Add" %}
+				<div class="list-group" style="display:inline-block; text-align:center; width:250px; z-index:1">
+					<a class="list-group-item list-group-item-action active" style="text-align:center; font-size:25px">
+						{{user}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						{% if 'http' in picture %}
+							<img src='{{picture.replace("/static/", "")}}' height="200" width="200">
+						{% else %}
+							<img src={{url_for("static", filename=picture)}} height="200" width="200">
+						{% endif %}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						DISROG Member Since {{date}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						Mutual Friends
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<form action="" method="POST">
+							<button type="submit" class="btn btn-outline-success" >Add Friend</button>
+							<input type="text" class="form-control" value={{user}},{{situation}} name=friend style="display:none">
+						</form>
+					</a>
+				</div>
+			{% endif %}
+
+			{% if situation == "Accept" %}
+				<div class="list-group" style="display:inline-block; text-align:center; width:250px; z-index:1">
+					<a class="list-group-item list-group-item-action active" style="text-align:center; font-size:25px">
+						{{user}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						{% if 'http' in picture %}
+							<img src='{{picture.replace("/static/", "")}}' height="200" width="200">
+						{% else %}
+							<img src={{url_for("static", filename=picture)}} height="200" width="200">
+						{% endif %}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						DISROG Member Since {{date}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						Mutual Friends
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<form action="" method="POST">
+							<button type="submit" class="btn btn-outline-success" >{{situation}}</button>
+							<input type="text" class="form-control" value={{user}},{{situation}} name=friend style="display:none">
+						</form>
+					</a>
+				</div>
+			{% endif %}
+
+			{% if situation == "Pending" %}
+				<div class="list-group" style="display:inline-block; text-align:center; width:250px">
+					<a class="list-group-item list-group-item-action active" style="text-align:center; font-size:25px">
+						{{user}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						{% if 'http' in picture %}
+							<img src='{{picture.replace("/static/", "")}}' height="200" width="200">
+						{% else %}
+							<img src={{url_for("static", filename=picture)}} height="200" width="200">
+						{% endif %}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						DISROG Member Since {{date}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						Mutual Friends
+					</a>
+					<a class="list-group-item list-group-item-action" style="text-align:center">
+						<button type="submit" class="btn btn-success disabled">{{situation}}</button>
+					</a>
+				</div>
+			{% endif %}
+
+			{% if situation == "Friend" %}
+				<div class="list-group" style="display:inline-block; text-align:center; width:250px">
+					<a class="list-group-item list-group-item-action active" style="text-align:center; font-size:25px">
+						{{user}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						{% if 'http' in picture %}
+							<img src='{{picture.replace("/static/", "")}}' height="200" width="200">
+						{% else %}
+							<img src={{url_for("static", filename=picture)}} height="200" width="200">
+						{% endif %}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						DISROG Member Since {{date}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						Mutual Friends
+					</a>
+					<a class="list-group-item list-group-item-action" style="text-align:center">
+						<button type="submit" class="btn btn-success disabled">{{situation}}</button>
+					</a>
+				</div>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Discover{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+<script>
+	function newFriendRequestOn()
+	{
+		const newFriendHead = document.getElementById("newHead");
+		const pendingFriendHead = document.getElementById("pendingHead");
+		const newFriendTab = document.getElementById("newTab");
+		const pendingFriendTab = document.getElementById("pendingTab");
+
+		pendingFriendTab.classList.remove("active", "show");
+        newFriendTab.classList.add("active", "show");
+
+        newFriendHead.classList.add("active");
+        pendingFriendHead.classList.remove("active");
+	}
+
+	function pendingFriendRequestOn()
+	{
+		const newFriendHead = document.getElementById("newHead");
+		const pendingFriendHead = document.getElementById("pendingHead");
+		const newFriendTab = document.getElementById("newTab");
+		const pendingFriendTab = document.getElementById("pendingTab");
+
+		newFriendTab.classList.remove("active", "show");
+        pendingFriendTab.classList.add("active", "show");
+
+        pendingFriendHead.classList.add("active");
+        newFriendHead.classList.remove("active");
+	}
+
+</script>
+
+<div class="jumbotron" style="height:920px">
+	<ul class="nav nav-tabs" style="text-align:center">
+		<li class="nav-item active">
+			<a class="nav-link active" data-bs-toggle="tab" href="#new" style="background-color:#f7f7f9; margin-bottom:0px; border-bottom:3px" id="newHead" onclick="newFriendRequestOn()">NEW FRIEND REQUESTS</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="tab" href="#pending" style="background-color:#f7f7f9; margin-bottom:0px; border-bottom:3px" id="pendingHead" onclick="pendingFriendRequestOn()">PENDING FRIEND REQUESTS</a>
+		</li>
+	</ul>
+
+	<div id="myTabContent" class="tab-content">
+		<div class="tab-pane fade active show" id="newTab">
+			{% if friend_requests_length == 1 %}
+				<br>
+				<br>
+				<br>
+				<br>
+				<br>
+				<h2 style="text-align:center">NO NEW FRIEND REQUESTS</h2>
+			{% endif %}
+			<table class="table table-hover" style="text-align:center">
+				<tbody>
+					{% for user in friend_requests %}
+						{% if user != "" %}
+							<tr class="table-active">
+								<td>
+									{% if "http" in friend_requests_pictures[friend_requests.index(user)] %}
+										<img src={{friend_requests_pictures[friend_requests.index(user)]}} height="50" width="50">
+									{% else %}
+										<img src={{url_for("static", filename=friend_requests_pictures[friend_requests.index(user)])}} height="50" width="50">
+									{% endif %}
+									 {{user}}
+								</td>
+								<td>
+									<form action="" method="POST">
+										<button type="submit" class="btn btn-success">Accept</button>
+										<input type="text" class="form-control" value={{user}},accept name=action style="display:none">
+									</form>
+								</td>
+								<td>
+									<form action="" method="POST">
+										<button type="submit" class="btn btn-danger">Ignore</button>
+										<input type="text" class="form-control" value={{user}},ignore name=action style="display:none">
+									</form>
+								</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane fade" id="pendingTab">
+			{% if pending_requests_length == 1 %}
+				<br>
+				<br>
+				<br>
+				<br>
+				<br>
+				<h2 style="text-align:center">NO PENDING FRIEND REQUESTS</h2>
+			{% endif %}
+			<table class="table table-hover" >
+				<tbody>
+					{% for user in pending_requests %}
+						{% if user != "" %}
+							<tr class="table-active">
+								<td></td>
+								<td></td>
+								<td>
+									{% if "http" in pending_requests_pictures[pending_requests.index(user)] %}
+										<img src={{pending_requests_pictures[pending_requests.index(user)]}} height="50" width="50">
+									{% else %}
+										<img src={{url_for("static", filename=pending_requests_pictures[pending_requests.index(user)])}} height="50" width="50">
+									{% endif %}
+									 {{user}}
+								</td>
+								<td></td>
+								<td>
+									<form action="" method="POST">
+										<button type="submit" class="btn btn-danger">Cancel</button>
+										<input type="text" class="form-control" value={{user}},cancel name=action style="display:none">
+									</form>
+								</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}

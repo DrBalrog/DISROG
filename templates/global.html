@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Global Chat{% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+{% block content %}
+
+<script type="text/javascript">
+	var socket = io('http://' + document.domain + ':' + location.port);
+
+	socket.on('connect', function() {
+    console.log("Connected!");
+
+	});
+
+
+	function pressEntr()
+	{
+	    if(event.keyCode == 13)
+	    {
+	        sendMsg()
+	    }
+	}
+
+	function sendMsg()
+	{
+		const message = document.getElementById("myMessage");
+
+		if(message.value.length === 0)
+		{
+			const error = document.getElementById("error");
+			error.content = "You Can't send empty messages!";
+			error.style.display = "inline-block";
+		}
+
+		else if(message.value.length === 1024)
+		{
+			const error = document.getElementById("error");
+			error.content = "This message is too long!";
+			error.style.display = "inline-block";
+		}
+
+		else
+		{
+			socket.send(myMessage.value);
+		}
+		myMessage.value = '';
+	}
+
+
+	function disappearError()
+	{
+		const error = document.getElementById("error");
+		error.style.display = "none"
+	}
+
+	socket.on("globalMessage", function(message)
+	{
+		addMessage(message);
+	});
+
+
+	function addMessage(message)
+	{
+		if(message[4].split(':')[0] === 'https')
+		{
+			newMessage = '<br>' +
+					 '<img src= ' + message[0] + ' height="50" width="50">' +
+					 '<span class="text-success" style="font-size:25px">' + ' ' + message[1] + '</span>' +
+					 '<span style="font-size:15px">' + ' ' + message[2] + message[3] + '</span>' +
+					 '<a href= ' + message[4] + ' class="text-info" style="font-size:25px; margin-left:58px; display:block">' + message[4] + '</a>';
+		}
+
+		else
+		{
+			newMessage = '<br>' +
+						 '<img src= ' + message[0] + ' height="50" width="50">' +
+						 '<span class="text-success" style="font-size:25px">' + ' ' + message[1] + '</span>' +
+						 '<span style="font-size:15px">' + ' ' + message[2] + message[3] + '</span>' +
+						 '<span style="font-size:25px; margin-left:58px; display:block">' + message[4] + '</span>';
+		}
+
+		document.getElementById("textDiv").innerHTML += newMessage;
+	}
+</script>
+
+<div class="jumbotron">
+	<div class="card border-primary mb-3">
+		<div class="card-body" style="height: 730px; overflow-y: scroll; display: flex; flex-direction: column-reverse;" id="textContainer">
+			<div class="form-group" , id="textDiv">
+				{% for msg in messages %}
+					{% if msg.split(' ')[0] != "" %}
+						{% if msg.split(' ')[-1].split(':')[0] == "https" %}
+						<br/>
+						<img src={{msg.split(' ')[0]}} height="50" width="50">
+						<span class="text-success" style="font-size:25px">{{msg.split(' ')[1]}}</span> <span style="font-size:15px">{{msg.split(' ')[2]}} {{msg.split(' ')[3]}}</span>
+						<a href="{{msg.split(' ', 4)[4]}}" class="text-info" style="font-size:25px; margin-left:50px; display:block"> &nbsp;{{msg.split(' ', 4)[4]}}</a>
+						{% else %}
+							<br/>
+							<img src={{msg.split(' ')[0]}} height="50" width="50">
+							<span class="text-success" style="font-size:25px">{{msg.split(' ')[1]}}</span> <span style="font-size:15px">{{msg.split(' ')[2]}} {{msg.split(' ')[3]}}</span>
+							<span style="font-size:25px; margin-left:50px; display:block">&nbsp;{{msg.split(' ', 4)[4]}}</span>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+	<p class="text-danger">{{ error_output }}</p>
+	<div class="card border-primary mb-3" style="height: 47px">
+		<div class="input-group mb-3">
+			<input style="height: 45px" type="text" class="form-control" placeholder="Write here your message" name="message" id="myMessage" onfocus="disappearError()" onkeydown="pressEntr()">
+			<div class="input-group-append" style="height: 45px">
+				<button class="btn btn-success" type="button" onclick="sendMsg()" id="sendBtn">Send</button>
+			</div>
+			<div class="invalid-feedback" id="error" style="display:none; font-size:15px">
+				You Can't send empty messages
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

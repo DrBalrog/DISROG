@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+<div class="jumbotron">
+	<div class="list-group">
+		<form method="POST" action="">
+			<a class="list-group-item list-group-item-action active" style="text-align:center">
+				{% if 'http' in picture %}
+					<img src='{{picture|replace("/static/", "")}}' height="50" width="50">
+				{% else %}
+					<img src={{url_for("static", filename=picture)}} height="50" width="50">
+				{% endif %}
+				<label class="col-form-label" style="font-size: 25px">{{user}}</label>
+			</a>
+			<a class="list-group-item list-group-item-action">
+				<label class="col-form-label">CHANGE USERNAME</label>
+				<input type="text" class="form-control" placeholder="{{user}}" name="changeUsername">
+			</a>
+			<a class="list-group-item list-group-item-action">
+				<label class="col-form-label">CHANGE PROFILE PICTURE</label>
+				<br/>
+				{% if 'http' in picture %}
+					<img src='{{picture|replace("/static/", "")}}' height="80" width="80">
+				{% else %}
+					<img src={{url_for("static", filename=picture)}} height="80" width="80">
+				{% endif %}
+				<input type="text" class="form-control" placeholder="Paste here your picture link" name="changePicture">
+			</a>
+			<a class="list-group-item list-group-item-action">
+				<label class="col-form-label">CHANGE EMAIL</label>
+				<input type="email" class="form-control" placeholder="{{email}}" name="changeEmail">
+			</a>
+			<a class="list-group-item list-group-item-action">
+				<label class="col-form-label">CHANGE PASSWORD</label>
+				<input type="password" class="form-control" placeholder="New Password" name="changePassword">
+				<br/>
+				<input type="password" class="form-control" placeholder="Repeat New Password" name="changePassword2">
+			</a>
+			<a class="list-group-item list-group-item-action">
+				<label class="col-form-label">CONFIRM THE CHANGES</label>
+				<input type="password" class="form-control" placeholder="Current Password" name="confirmation">
+			</a>
+			<a class="list-group-item list-group-item-action" style="text-align:center">
+				<p class="text-danger">{{ error_output }}</p>
+				<p class="text-success">{{ confirmation_output }}</p>
+				<button type="submit" class="btn btn-success">Confirm</button>
+			</a>
+		</form>
+	</div>
+</div>
+{% endblock %}

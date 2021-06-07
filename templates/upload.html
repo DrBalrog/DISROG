@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Upload{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+{% block content %}
+<script>
+	if ( window.history.replaceState ) {
+              window.history.replaceState( null, null, window.location.href );
+            }
+</script>
+
+<div class="jumbotron" style="height:920px">
+	<form action="" method="POST">
+		<center>
+			<br><br>
+			<h1> Paste Here a Song Link From YouTube To Upload </h1>
+			<br><br><br>
+			<div class="card border-primary mb-3" style="float:center; height: 47px; width:650px">
+				<div class="input-group mb-3">
+					<input style="height: 45px" type="text" class="form-control" placeholder="YouTube URL" name="upload" id="myMessage">
+					<div class="input-group-append" style="height: 45px">
+						<button class="btn btn-info" type="submit">Upload</button>
+					</div>
+				</div>
+			</div>
+			{% if output_message == "Your Song Has Been Uploaded!" %}
+				<p class="text-success">{{output_message}}</p>
+				<br><br>
+				<div style="width:1280px; display:block">
+					<video autoplay controls width="640px" height="360px" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+						<source src='/static/music/{{song_url_title}}' type="video/mp4">
+					</video>
+					<br>
+					<a class="text-primary" href="/home/{{song_url_title.split('.')[0]}}">{{song_url_title.split('.')[0]}}</a>
+				</div>
+			{% elif output_message == "Someone Already Uploaded This Song... Try Another Song" %}
+				<p class="text-danger">{{output_message}}</p>
+				<br><br>
+				<div style="width:1280px; display:block">
+					<video autoplay controls width="640px" height="360px" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+						<source src='/static/music/{{song_url_title}}' type="video/mp4">
+					</video>
+					<br>
+					<a class="text-primary" href="/home/{{song_url_title.split('.')[0]}}">{{song_url_title.split('.')[0]}}</a>
+				</div>
+			{% else %}
+				<p class="text-danger">{{output_message}}</p>
+			{% endif %}
+		</center>
+	</form>
+</div>
+
+{% endblock %}

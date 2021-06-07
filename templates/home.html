@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+{% block content %}
+
+<div class="jumbotron" style="display:flex">
+	<div style="max-width:1920px">
+		{% for song in playlist %}
+			{% if song|length > 55 %}
+				<div style="float:left; display:block; max-width:426px; margin:10px">
+					<video autoplay muted height="240px" width="426px" style="background-image: url('static/black.jpg')">
+						<source src='/static/music/{{song}}' type="video/mp4">
+					</video>
+					<a class="text-primary" href="/home/{{song.split('.')[0]}}">{{song.split('.')[0][0:52]}}...</a>
+				</div>
+			{% else %}
+				<div style="float:left; display:block; max-width:426px; margin:10px">
+					<video autoplay muted height="240px" width="426px" style="background-image: url('static/black.jpg')">
+						<source src='/static/music/{{song}}' type="video/mp4">
+					</video>
+					<a class="text-primary" href="/home/{{song.split('.')[0]}}">{{song.split('.')[0]}}</a>
+				</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>
+
+{% endblock %}

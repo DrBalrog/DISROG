@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block title %}Home - Watch{% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+{% block content %}
+
+<div class="jumbotron" style="height:920px">
+	<div id="songsDiv">
+		{% if liked_songs != None and song in liked_songs %}
+			<div style="float:left; width:1280px; display:block; margin-right:80px">
+				<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+					<source src='/static/music/{{song + ".mp4"}}' type="video/mp4">
+				</video>
+				<h2>{{song}}</h2>
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onUnLike()">
+					<img src={{url_for("static", filename="images/BlueLike.png")}} width="25" height="25" id="like1">
+				</button>
+				<span id="Likes1">{{song_likes}}</span><span> Likes</span>
+				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike()">
+					<img src={{url_for("static", filename="images/GrayDislike.png")}} width="25" height="25" id="dislike1">
+				</button>
+				<span id="Dislikes1">{{song_dislikes}}</span><span> Dislikes</span>
+				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+			</div>
+		{% elif disliked_songs != None and song in disliked_songs %}
+			<div style="float:left; width:1280px; display:block; margin-right:80px">
+				<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+					<source src='/static/music/{{song + ".mp4"}}' type="video/mp4">
+				</video>
+				<h2>{{song}}</h2>
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onLike()">
+					<img src={{url_for("static", filename="images/GrayLike.png")}} width="25" height="25" id="like2">
+				</button>
+				<span id="Likes2">{{song_likes}}</span><span> Likes</span>
+				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onUnDislike()">
+					<img src={{url_for("static", filename="images/BlueDislike.png")}} width="25" height="25" id="dislike2">
+				</button>
+				<span id="Dislikes2">{{song_dislikes}}</span><span> Dislikes</span>
+				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+			</div>
+
+		{% else %}
+			<div style="float:left; width:1280px; display:block; margin-right:80px">
+				<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+					<source src='/static/music/{{song + ".mp4"}}' type="video/mp4">
+				</video>
+				<h2>{{song}}</h2>
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onLike()">
+					<img src={{url_for("static", filename="images/GrayLike.png")}} width="25" height="25" id="like">
+				</button>
+				<span id="Likes">{{song_likes}}</span><span> Likes</span>
+				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
+
+				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike()">
+					<img src={{url_for("static", filename="images/GrayDislike.png")}} width="25" height="25" id="dislike">
+				</button>
+				<span id="Dislikes">{{song_dislikes}}</span><span> Dislikes</span>
+				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+			</div>
+		{% endif %}
+
+		<div id="nextSongs">
+			{% if playlist|length < playlist.index(song+ ".mp4")+2 %}
+				{% if playlist[0].split(".")[0]|length > 52 %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[0]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[0].split(".")[0]}}'>{{playlist[0].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[0]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[0].split(".")[0]}}'>{{playlist[0].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+				{% if playlist[1].split(".")[0]|length > 52 %}
+					<div>
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[1].split(".")[0]}}'>{{playlist[1].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div>
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[1].split(".")[0]}}'>{{playlist[1].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+
+			{% elif playlist|length == playlist.index(song+ ".mp4")+2 %}
+				{% if playlist[playlist.index(song+ ".mp4")+1].split(".")[0]|length > 52 %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+				{% if playlist[0].split(".")[0]|length > 52 %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[0]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[0].split(".")[0]}}'>{{playlist[0].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[0]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[0].split(".")[0]}}'>{{playlist[0].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+
+			{% else %}
+				{% if playlist[playlist.index(song+ ".mp4")+1].split(".")[0]|length > 52 %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div style="margin-bottom:40px">
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+1]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+1].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+				{% if playlist[playlist.index(song+ ".mp4")+2].split(".")[0]|length > 52 %}
+					<div>
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+2]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+2].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+2].split(".")[0][0:52]}}...</a>
+					</div>
+				{% else %}
+					<div>
+						<video muted autoplay width="426" height="240" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{playlist[playlist.index(song+ ".mp4")+2]}}' type="video/mp4">
+						</video>
+						<br>
+						<a class="text-primary" href='/home/{{playlist[playlist.index(song+ ".mp4")+2].split(".")[0]}}'>{{playlist[playlist.index(song+ ".mp4")+2].split(".")[0]}}</a>
+					</div>
+				{% endif %}
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<script>
+	var socket = io('http://' + document.domain + ':' + location.port);
+
+	socket.on('connect', function() {
+    console.log("Connected!");
+	});
+
+	socket.on('disconnect', function() {
+    console.log("Disconnected!");
+	});
+
+	function onLike()
+	{
+		var likeImage = document.getElementById("like");
+		var dislikeImage = document.getElementById("dislike");
+		var likesAmount = document.getElementById("Likes");
+		var dislikesAmount = document.getElementById("Dislikes");
+
+		if(likeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayLike.png")}}')
+		{
+			console.log(likeImage)
+			likeImage.src = '{{url_for("static", filename="images/BlueLike.png")}}';
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) + 1;
+			if(dislikesAmount.innerHTML != 0)
+			{
+				dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+			}
+		}
+		else{
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+		}
+	}
+
+	function onDislike()
+	{
+		var likeImage = document.getElementById("like");
+		var dislikeImage = document.getElementById("dislike");
+		var likesAmount = document.getElementById("Likes");
+		var dislikesAmount = document.getElementById("Dislikes");
+
+		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
+			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) + 1;
+			if(likesAmount.innerHTML != 0){
+				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+			}
+		}
+		else{
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+		}
+	}
+
+	function onUnLike()
+	{
+		var likeImage = document.getElementById("like");
+		var dislikeImage = document.getElementById("dislike");
+		var likesAmount = document.getElementById("Likes");
+		var dislikesAmount = document.getElementById("Dislikes");
+
+		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
+			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) + 1;
+			if(likesAmount.innerHTML != 0){
+				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+			}
+		}
+		else{
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+		}
+	}
+
+	function onUnDislike()
+	{
+		var likeImage = document.getElementById("like");
+		var dislikeImage = document.getElementById("dislike");
+		var likesAmount = document.getElementById("Likes");
+		var dislikesAmount = document.getElementById("Dislikes");
+
+		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
+			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) + 1;
+			if(likesAmount.innerHTML != 0){
+				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+			}
+		}
+		else{
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+		}
+	}
+</script>
+
+{% endblock %}

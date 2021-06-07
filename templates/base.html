@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="shortcut icon" href={{url_for("static", filename="Logo.png")}} type="image/x-icon">
+    <title>{% block title %}{% endblock %}</title>
+	<link rel ="stylesheet" href = "https://bootswatch.com/4/lux/bootstrap.min.css">
+
+	<!--&lt;!&ndash; SocketIO &ndash;&gt;-->
+	<!--<script src="{{ url_for('static', filename='scripts/drawapp.js') }}" ></script>-->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script>
+	function search()
+    {
+        let search_input = document.getElementById("searchInput");
+        let search_form = document.getElementById("searchForm");
+        if (search_input.value.length > 0) search_form.submit();
+
+    }
+</script>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<img src={{url_for("static", filename="Logo.png")}} height="50" width="50">
+		<a style="font-size: 25px" class="navbar-brand">&nbsp; DISROG</a>
+		<div class="collapse navbar-collapse" id="navbarColor01">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+			        <a class="nav-link" href="/home">Home</a>
+		        </li>
+		        <li class="nav-item">
+		            <a class="nav-link" href="/live">Live Music</a>
+		        </li>
+				<li class="nav-item">
+			        <a class="nav-link" href="/new">New Music</a>
+		        </li>
+				<li class="nav-item">
+			        <a class="nav-link" href="/upload">Upload</a>
+		        </li>
+		        <li class="nav-item">
+			        <a class="nav-link" href="/friends">Friends</a>
+		        </li>
+				<li class="nav-item">
+			        <a class="nav-link" href="/profile">Profile</a>
+		        </li>
+		        <li class="nav-item">
+			        <a style="color:red" class="nav-link" href="/logout">Log Out</a>
+		        </li>
+		    </ul>
+		    <form class="form-inline my-2 my-lg-0" action="/search" method="POST" id="searchForm">
+		        <input class="form-control mr-sm-2" type="text" placeholder="Enter a Username" name="searchKey" id="searchInput">
+		        <button class="btn btn-secondary my-2 my-sm-0" type="button" onclick="search()">Search</button>
+		    </form>
+		</div>
+	</nav>
+
+{% block content %} {% endblock %}
+
+</body>
+</html>

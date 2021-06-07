@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}New Music{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+
+<div class="jumbotron" style="height:920px">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<td scope="col" style="text-align:center">LATEST RELEASES</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[0]}}">{{playlist[0]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[1]}}">{{playlist[1]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[2]}}">{{playlist[2]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[3]}}">{{playlist[3]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[4]}}">{{playlist[4]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[5]}}">{{playlist[5]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[6]}}">{{playlist[6]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[7]}}">{{playlist[7]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[8]}}">{{playlist[8]}}</a></td>
+			</tr>
+			<tr class="table-active">
+				<td scope="row"><a href="/home/{{playlist[9]}}">{{playlist[9]}}</a></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+{% endblock %}

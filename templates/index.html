@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="shortcut icon" href={{url_for("static", filename="Logo.png")}} type="image/x-icon">
+    <title>Disrog</title>
+	<link rel ="stylesheet" href = "https://bootswatch.com/4/lux/bootstrap.min.css">
+</head>
+<body style="text-align:center;">
+	<div class="jumbotron">
+		<br/><br/><br/>
+		<img src={{url_for("static", filename="Logo.png")}}>
+        <h1 class="display-3">Welcome To DISROG!</h1>
+		<br/>
+        <hr class="my-4">
+		<br/>
+        <a class="lead" href="login">
+	        <button style="width: 220px; height: 100px; font-size: 25px" type="button" class="btn btn-outline-primary">Sign In</button>
+		</a>
+		<br/><br/>
+		<p class="lead">Is this your first time?</p>
+		<a class="lead" href="register">
+			<button type="button" class="btn btn-outline-success">Sign Up</button>
+		</a>
+		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	</div>
+</body>
+</html>

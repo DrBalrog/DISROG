@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Friends{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
+
+<div class="jumbotron" style="height:920px">
+	<div class="list-group" style="width: 250px; float:left">
+		<a class="list-group-item list-group-item-action active" style="text-align:center" href="/friends">Friends List</a>
+
+		{% for username in friends_list %}
+			{% if username != "" %}
+				<a class="list-group-item list-group-item-action" id={{username}} href="{{username}}">
+					{{ username }}
+				</a>
+			{% endif %}
+		{% endfor %}
+	</div>
+
+	<center>
+		<div class="card border-primary mb-3" style="max-width:500px">
+			<div class="card-header" style="text-align:center; font-size:30px; color:black">{{friend_name}}</div>
+			<div class="card-body">
+				{% if 'http' in friend_picture %}
+					<img src='{{friend_picture.replace("/static/", "")}}' height="100" width="100">
+				{% else %}
+					<img src={{url_for("static", filename=friend_picture)}} height="100" width="100">
+				{% endif %}
+				<br><br>
+				<p class="card-text"><span style="color: black">Mutual Friends: </span>{{mutual_friends}}</p>
+			</div>
+		</div>
+	</center>
+</div>
+{% endblock %}
