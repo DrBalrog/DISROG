@@ -13,18 +13,29 @@
 				</video>
 				<h2>{{song}}</h2>
 
-				<button style="border: none; background-color: Transparent" type="button" onclick="onUnLike()">
+				<button style="border: none; background-color: Transparent" type="button" onclick="onLike1()">
 					<img src={{url_for("static", filename="images/BlueLike.png")}} width="25" height="25" id="like1">
 				</button>
 				<span id="Likes1">{{song_likes}}</span><span> Likes</span>
-				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
 
-				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike()">
+				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike1()">
 					<img src={{url_for("static", filename="images/GrayDislike.png")}} width="25" height="25" id="dislike1">
 				</button>
 				<span id="Dislikes1">{{song_dislikes}}</span><span> Dislikes</span>
-				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+
+				{% if my_playlist != "" and song in my_playlist %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd1()">
+						<img src={{url_for("static", filename="images/BlueAdded.png")}} width="25" height="25" id="add1">
+					</button>
+					<span id="addText1">Added To Playlist</span>
+				{% else %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd11()">
+						<img src={{url_for("static", filename="images/GrayAdd.png")}} width="25" height="25" id="add11">
+					</button>
+					<span id="addText11">Add To Playlist</span>
+				{% endif %}
 			</div>
+
 		{% elif disliked_songs != None and song in disliked_songs %}
 			<div style="float:left; width:1280px; display:block; margin-right:80px">
 				<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
@@ -32,17 +43,27 @@
 				</video>
 				<h2>{{song}}</h2>
 
-				<button style="border: none; background-color: Transparent" type="button" onclick="onLike()">
+				<button style="border: none; background-color: Transparent" type="button" onclick="onLike2()">
 					<img src={{url_for("static", filename="images/GrayLike.png")}} width="25" height="25" id="like2">
 				</button>
 				<span id="Likes2">{{song_likes}}</span><span> Likes</span>
-				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
 
-				<button style="border: none; background-color: Transparent" type="button" onclick="onUnDislike()">
+				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike2()">
 					<img src={{url_for("static", filename="images/BlueDislike.png")}} width="25" height="25" id="dislike2">
 				</button>
 				<span id="Dislikes2">{{song_dislikes}}</span><span> Dislikes</span>
-				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+
+				{% if my_playlist != "" and song in my_playlist %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd2()">
+						<img src={{url_for("static", filename="images/BlueAdded.png")}} width="25" height="25" id="add2">
+					</button>
+					<span id="addText2">Added To Playlist</span>
+				{% else %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd22()">
+						<img src={{url_for("static", filename="images/GrayAdd.png")}} width="25" height="25" id="add22">
+					</button>
+					<span id="addText22">Add To Playlist</span>
+				{% endif %}
 			</div>
 
 		{% else %}
@@ -50,21 +71,32 @@
 				<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
 					<source src='/static/music/{{song + ".mp4"}}' type="video/mp4">
 				</video>
-				<h2>{{song}}</h2>
+				<h2 id="songName">{{song}}</h2>
 
 				<button style="border: none; background-color: Transparent" type="button" onclick="onLike()">
 					<img src={{url_for("static", filename="images/GrayLike.png")}} width="25" height="25" id="like">
 				</button>
 				<span id="Likes">{{song_likes}}</span><span> Likes</span>
-				<!--<input type="text" id="songLikes" value="like,{{song_likes}}" style="display: none">-->
 
 				<button style="border: none; background-color: Transparent" type="button" onclick="onDislike()">
 					<img src={{url_for("static", filename="images/GrayDislike.png")}} width="25" height="25" id="dislike">
 				</button>
-				<span id="Dislikes">{{song_dislikes}}</span><span> Dislikes</span>
-				<!--<input type="text" id="songDislikes" value="dislike,{{song_dislikes}}" style="display: none">-->
+				<span id="Dislikes">{{song_dislikes}}</span><span> Dislikes &nbsp;</span>
+
+				{% if my_playlist != "" and song in my_playlist %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd()">
+						<img src={{url_for("static", filename="images/BlueAdded.png")}} width="25" height="25" id="add">
+					</button>
+					<span id="addText">Added To Playlist</span>
+				{% else %}
+					<button style="border: none; background-color: Transparent" type="button" onclick="onAdd0()">
+						<img src={{url_for("static", filename="images/GrayAdd.png")}} width="25" height="25" id="add0">
+					</button>
+					<span id="addText0">Add To Playlist</span>
+				{% endif %}
 			</div>
 		{% endif %}
+
 
 		<div id="nextSongs">
 			{% if playlist|length < playlist.index(song+ ".mp4")+2 %}
@@ -190,6 +222,139 @@
     console.log("Disconnected!");
 	});
 
+	function onAdd()
+	{
+		var addButton = document.getElementById("add");
+		var addText = document.getElementById("addText");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+	function onAdd0()
+	{
+		var addButton = document.getElementById("add0");
+		var addText = document.getElementById("addText0");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+	function onAdd1()
+	{
+		var addButton = document.getElementById("add1");
+		var addText = document.getElementById("addText1");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+	function onAdd11()
+	{
+		var addButton = document.getElementById("add11");
+		var addText = document.getElementById("addText11");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+	function onAdd2()
+	{
+		var addButton = document.getElementById("add2");
+		var addText = document.getElementById("addText2");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+	function onAdd22()
+	{
+		var addButton = document.getElementById("add22");
+		var addText = document.getElementById("addText22");
+		var songName = document.getElementById("songName");
+
+		if(addButton.getAttribute('src') == '{{url_for("static", filename="images/BlueAdded.png")}}')
+		{
+			addButton.src = '{{url_for("static", filename="images/GrayAdd.png")}}';
+			addText.textContent = "Add To Playlist";
+
+			socket.emit("removeSongFromPlaylist", songName.textContent);
+		}
+		else
+		{
+			addButton.src = '{{url_for("static", filename="images/BlueAdded.png")}}';
+			addText.textContent = "Added To Playlist";
+
+			socket.emit("addSongToPlaylist", songName.textContent);
+		}
+	}
+
+
 	function onLike()
 	{
 		var likeImage = document.getElementById("like");
@@ -197,9 +362,10 @@
 		var likesAmount = document.getElementById("Likes");
 		var dislikesAmount = document.getElementById("Dislikes");
 
+		var songName = document.getElementById("songName");
+
 		if(likeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayLike.png")}}')
 		{
-			console.log(likeImage)
 			likeImage.src = '{{url_for("static", filename="images/BlueLike.png")}}';
 			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
 			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) + 1;
@@ -207,10 +373,14 @@
 			{
 				dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
 			}
+			socket.emit("addSongToLikes", songName.textContent);
 		}
-		else{
+		else
+		{
 			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
 			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromLikes", songName.textContent);
 		}
 	}
 
@@ -221,6 +391,8 @@
 		var likesAmount = document.getElementById("Likes");
 		var dislikesAmount = document.getElementById("Dislikes");
 
+		var songName = document.getElementById("songName");
+
 		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
 			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
 			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
@@ -228,40 +400,53 @@
 			if(likesAmount.innerHTML != 0){
 				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
 			}
+			socket.emit("addSongToDislikes", songName.textContent);
 		}
 		else{
 			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
 			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromDislikes", songName.textContent);
 		}
 	}
 
-	function onUnLike()
+	function onLike1()
 	{
-		var likeImage = document.getElementById("like");
-		var dislikeImage = document.getElementById("dislike");
-		var likesAmount = document.getElementById("Likes");
-		var dislikesAmount = document.getElementById("Dislikes");
+		var likeImage = document.getElementById("like1");
+		var dislikeImage = document.getElementById("dislike1");
+		var likesAmount = document.getElementById("Likes1");
+		var dislikesAmount = document.getElementById("Dislikes1");
 
-		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
-			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
-			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
-			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) + 1;
-			if(likesAmount.innerHTML != 0){
-				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
-			}
-		}
-		else{
+		var songName = document.getElementById("songName");
+
+		if(likeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayLike.png")}}')
+		{
+			likeImage.src = '{{url_for("static", filename="images/BlueLike.png")}}';
 			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
-			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) + 1;
+			if(dislikesAmount.innerHTML != 0)
+			{
+				dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+			}
+			socket.emit("addSongToLikes", songName.textContent);
+		}
+		else
+		{
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromLikes", songName.textContent);
 		}
 	}
 
-	function onUnDislike()
+	function onDislike1()
 	{
-		var likeImage = document.getElementById("like");
-		var dislikeImage = document.getElementById("dislike");
-		var likesAmount = document.getElementById("Likes");
-		var dislikesAmount = document.getElementById("Dislikes");
+		var likeImage = document.getElementById("like1");
+		var dislikeImage = document.getElementById("dislike1");
+		var likesAmount = document.getElementById("Likes1");
+		var dislikesAmount = document.getElementById("Dislikes1");
+
+		var songName = document.getElementById("songName");
 
 		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
 			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
@@ -270,12 +455,71 @@
 			if(likesAmount.innerHTML != 0){
 				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
 			}
+			socket.emit("addSongToDislikes", songName.textContent);
 		}
 		else{
 			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
 			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromDislikes", songName.textContent);
 		}
 	}
+
+	function onLike2()
+	{
+		var likeImage = document.getElementById("like2");
+		var dislikeImage = document.getElementById("dislike2");
+		var likesAmount = document.getElementById("Likes2");
+		var dislikesAmount = document.getElementById("Dislikes2");
+
+		var songName = document.getElementById("songName");
+
+		if(likeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayLike.png")}}')
+		{
+			likeImage.src = '{{url_for("static", filename="images/BlueLike.png")}}';
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) + 1;
+			if(dislikesAmount.innerHTML != 0)
+			{
+				dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+			}
+			socket.emit("addSongToLikes", songName.textContent);
+		}
+		else
+		{
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromLikes", songName.textContent);
+		}
+	}
+
+	function onDislike2()
+	{
+		var likeImage = document.getElementById("like2");
+		var dislikeImage = document.getElementById("dislike2");
+		var likesAmount = document.getElementById("Likes2");
+		var dislikesAmount = document.getElementById("Dislikes2");
+
+		var songName = document.getElementById("songName");
+
+		if(dislikeImage.getAttribute('src') == '{{url_for("static", filename="images/GrayDislike.png")}}'){
+			dislikeImage.src = '{{url_for("static", filename="images/BlueDislike.png")}}';
+			likeImage.src = '{{url_for("static", filename="images/GrayLike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) + 1;
+			if(likesAmount.innerHTML != 0){
+				likesAmount.innerHTML = parseInt(likesAmount.innerHTML) - 1;
+			}
+			socket.emit("addSongToDislikes", songName.textContent);
+		}
+		else{
+			dislikeImage.src = '{{url_for("static", filename="images/GrayDislike.png")}}';
+			dislikesAmount.innerHTML = parseInt(dislikesAmount.innerHTML) - 1;
+
+			socket.emit("removeSongFromDislikes", songName.textContent);
+		}
+	}
+
 </script>
 
 {% endblock %}

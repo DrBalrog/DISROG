@@ -6,7 +6,6 @@ import datetime
 import pytube
 import os
 from pathlib import Path
-import glob
 import random
 
 
@@ -32,8 +31,9 @@ class Users(db.Model):
 	friends = db.Column(db.String, nullable=True)   # My friends
 	requests = db.Column(db.String, nullable=True)  # Friends requests people sent to me (I need to accept)
 	pending = db.Column(db.String, nullable=True)   # Friends requests I sent to people
-	likes = db.Column(db.String, nullable=True)     # Liked songs
-	dislikes = db.Column(db.String, nullable=True)  # Disliked songs
+	likes = db.Column(db.String, nullable=True)
+	dislikes = db.Column(db.String, nullable=True)
+	my_playlist = db.Column(db.String, nullable=True)
 
 
 # Home page
@@ -110,7 +110,7 @@ def register():
 			creation_date = str(creation_date).split('-')
 			fixed_date = creation_date[2] + '.' + creation_date[1] + '.' + creation_date[0]
 
-			user = Users(username=username, password=password, picture="images/DefaultPFP.png", date=fixed_date, email="You haven't added an email yet", friends="", requests="", pending="")
+			user = Users(username=username, password=password, picture="images/DefaultPFP.png", date=fixed_date, email="You haven't added an email yet", friends="", requests="", pending="", likes="", dislikes="", my_playlist="")
 			db.session.add(user)
 			db.session.commit()
 			return redirect(url_for("login"))
@@ -150,29 +150,27 @@ def watch(song):
 
 		for user in all_users:
 			print(user.likes)
-			if user.likes is not None:
-				user_likes = user.likes.split(',')
-				for liked_song in user_likes:
-					if liked_song in playlist:
-						song_likes += 1
-			print(user.likes)
-			if user.dislikes is not None:
-				user_dislikes = user.dislikes.split(',')
-				for disliked_song in user_dislikes:
-					if disliked_song in playlist:
-						song_dislikes += 1
+			if user.likes is not None and song in user.likes:
+				song_likes += 1
+			print(user.dislikes)
+			if user.dislikes is not None and song in user.dislikes:
+				song_dislikes += 1
 
 		found_user = Users.query.filter_by(username=username).first()
 		liked_songs = found_user.likes
 		disliked_songs = found_user.dislikes
+		if found_user.my_playlist is not None:
+			my_playlist = found_user.my_playlist.split(',')
+		else:
+			my_playlist = ""
 
-		return render_template('watch.html', playlist=playlist, song=song, song_likes=song_likes, song_dislikes=song_dislikes, liked_songs=liked_songs, disliked_songs=disliked_songs)
+		return render_template('watch.html', playlist=playlist, song=song, song_likes=song_likes, song_dislikes=song_dislikes, liked_songs=liked_songs, disliked_songs=disliked_songs, my_playlist=my_playlist)
 
 	else:
 		return redirect(url_for("login"))
 
 
-# Global chat page
+# Live music and global chat page
 @app.route('/live', methods=["POST", "GET"])
 def live():
 	error_output = ""
@@ -190,6 +188,48 @@ def live():
 		print(playlist)
 
 		return render_template("live.html", user=username, messages=split_messages, playlist=playlist)
+
+	else:
+		return redirect(url_for("login"))
+
+
+@app.route('/playlist', methods=["POST", "GET"])
+def user_playlist():
+	if 'username' in session:
+		username = session['username']
+
+		found_user = Users.query.filter_by(username=username).first()
+
+		if found_user.my_playlist is not None:
+			playlist = found_user.my_playlist.split(',')
+			first_song = playlist[0]
+			playlist_length = len(playlist) - 1
+		else:
+			playlist = ""
+			first_song = ""
+			playlist_length = 0
+
+		return render_template("playlists.html", playlist=playlist, first_song=first_song, playlist_length=playlist_length)
+
+	else:
+		return redirect(url_for("login"))
+
+
+@app.route('/playlist/<string:song>')
+def song_from_playlist(song):
+	if 'username' in session:
+		username = session['username']
+
+		found_user = Users.query.filter_by(username=username).first()
+
+		if found_user.my_playlist is not None:
+			playlist = found_user.my_playlist.split(',')
+		else:
+			playlist = ""
+
+		print(playlist)
+
+		return render_template('playlist.html', playlist=playlist, song=song)
 
 	else:
 		return redirect(url_for("login"))
@@ -263,8 +303,14 @@ def friends():
 
 		found_user = Users.query.filter_by(username=username).first()
 
-		friends_list = found_user.friends.split(',')
-		new_requests = len(found_user.requests.split(',')) - 1
+		if found_user.friends is not None:
+			friends_list = found_user.friends.split(',')
+		else:
+			friends_list = []
+		if found_user.requests is not None:
+			new_requests = len(found_user.requests.split(',')) - 1
+		else:
+			new_requests = 0
 
 		return render_template('friends.html', friends_list=friends_list, new_requests=new_requests)
 
@@ -284,9 +330,18 @@ def DM(friend):
 		friend_user = Users.query.filter_by(username=friend).first()
 		friend_picture = friend_user.picture
 
-		my_friends = my_user.friends.split(',')
-		friend_friends = friend_user.friends.split(',')
+		friend_date = friend_user.date
+
+		if my_user.friends is not None:
+			my_friends = my_user.friends.split(',')
+		else:
+			my_friends = ""
+		if friend_user.friends is not None:
+			friend_friends = friend_user.friends.split(',')
+		else:
+			friend_friends = ""
 		mutual_friends = ""
+
 		for f in my_friends:
 			if f in friend_friends and f != "":
 				if mutual_friends != "":
@@ -296,7 +351,27 @@ def DM(friend):
 		if mutual_friends == "":
 			mutual_friends = "No mutual friends"
 
-		return render_template('dms.html', friends_list=friends_list, friend_name=friend, friend_picture=friend_picture, mutual_friends=mutual_friends)
+		# Check matching percentage
+		if my_user.my_playlist is not None:
+			playlist1 = my_user.my_playlist.split(',')
+		else:
+			playlist1 = []
+		if friend_user.my_playlist is not None:
+			playlist2 = friend_user.my_playlist.split(',')
+		else:
+			playlist2 = []
+		if my_user.likes is not None:
+			liked1 = my_user.likes.split(',')
+		else:
+			liked1 = []
+		if friend_user.likes is not None:
+			liked2 = friend_user.likes.split(',')
+		else:
+			liked2 = []
+
+		matching_percentage = check_match(playlist1, playlist2, liked1, liked2)
+
+		return render_template('dms.html', friends_list=friends_list, friend_name=friend, friend_picture=friend_picture, friend_date=friend_date, mutual_friends=mutual_friends, matching_percentage=matching_percentage)
 
 	else:
 		return redirect(url_for("login"))
@@ -394,11 +469,17 @@ def search():
 				# add his username to my pending requests and my username to his friend requests
 				if friend_request[1] == "Add":
 					my_user = Users.query.filter_by(username=username).first()
-					my_user.pending += friend_request[0] + ','
+					if my_user.pending is None:
+						my_user.pending = friend_request[0] + ','
+					else:
+						my_user.pending += friend_request[0] + ','
 					db.session.commit()
 
 					friend_user = Users.query.filter_by(username=friend_request[0]).first()
-					friend_user.requests += username + ','
+					if friend_user.requests is None:
+						friend_user.requests = username + ','
+					else:
+						friend_user.requests += username + ','
 					db.session.commit()
 
 				# when accepting friend request:
@@ -406,7 +487,10 @@ def search():
 				if friend_request[1] == "Accept":
 					my_user = Users.query.filter_by(username=username).first()
 					my_user.requests = my_user.requests.replace(friend_request[0] + ',', '')
-					my_user.friends += friend_request[0] + ','
+					if my_user.friends is None:
+						my_user.friends = friend_request[0] + ','
+					else:
+						my_user.friends += friend_request[0] + ','
 					db.session.commit()
 
 					friend_user = Users.query.filter_by(username=friend_request[0]).first()
@@ -421,12 +505,18 @@ def search():
 			all_users = Users.query.all()
 			found_users_list = []
 
-			my_friends = Users.query.filter_by(username=username).first().friends.split(',')
-			print(my_friends)
-			requests = Users.query.filter_by(username=username).first().requests.split(',')
-			print(requests)
-			pending_requests = Users.query.filter_by(username=username).first().pending.split(',')
-			print(pending_requests)
+			if Users.query.filter_by(username=username).first().friends is None:
+				my_friends = ""
+			else:
+				my_friends = Users.query.filter_by(username=username).first().friends.split(',')
+			if Users.query.filter_by(username=username).first().requests is None:
+				firnd_requests = ""
+			else:
+				firnd_requests = Users.query.filter_by(username=username).first().requests.split(',')
+			if Users.query.filter_by(username=username).first().pending is None:
+				pending_requests = ""
+			else:
+				pending_requests = Users.query.filter_by(username=username).first().pending.split(',')
 
 			# get all the users that match the search key from the database
 			# and create a list with their username, picture, user creation date and situation(friend/pending/not friend)
@@ -436,14 +526,57 @@ def search():
 						pass
 
 					else:
-						if user.username in my_friends:
-							found_users_list.append([user.username, user.picture, user.date, "Friend"])
-						elif user.username in requests:
-							found_users_list.append([user.username, user.picture, user.date, "Accept"])
-						elif user.username in pending_requests:
-							found_users_list.append([user.username, user.picture, user.date, "Pending"])
+						my_user = Users.query.filter_by(username=username).first()
+						friend_user = Users.query.filter_by(username=user.username).first()
+
+						# Check mutual friends
+						if my_user.friends is not None:
+							my_friends = my_user.friends.split(',')
 						else:
-							found_users_list.append([user.username, user.picture, user.date, "Add"])
+							my_friends = ""
+						if friend_user.friends is not None:
+							friend_friends = friend_user.friends.split(',')
+						else:
+							friend_friends = ""
+						mutual_friends = ""
+
+						for f in my_friends:
+							if f in friend_friends and f != "":
+								if mutual_friends != "":
+									mutual_friends += ', ' + f
+								else:
+									mutual_friends += f
+						if mutual_friends == "":
+							mutual_friends = "No mutual friends"
+
+						# Check matching percentage
+						if my_user.my_playlist is not None:
+							playlist1 = my_user.my_playlist.split(',')
+						else:
+							playlist1 = []
+						if friend_user.my_playlist is not None:
+							playlist2 = friend_user.my_playlist.split(',')
+						else:
+							playlist2 = []
+						if my_user.likes is not None:
+							liked1 = my_user.likes.split(',')
+						else:
+							liked1 = []
+						if friend_user.likes is not None:
+							liked2 = friend_user.likes.split(',')
+						else:
+							liked2 = []
+
+						matching_percentage = check_match(playlist1, playlist2, liked1, liked2)
+
+						if user.username in my_friends:
+							found_users_list.append([user.username, user.picture, user.date, mutual_friends, matching_percentage, "Friend"])
+						elif user.username in firnd_requests:
+							found_users_list.append([user.username, user.picture, user.date, mutual_friends, matching_percentage, "Accept"])
+						elif user.username in pending_requests:
+							found_users_list.append([user.username, user.picture, user.date, mutual_friends, matching_percentage, "Pending"])
+						else:
+							found_users_list.append([user.username, user.picture, user.date, mutual_friends, matching_percentage, "Add"])
 
 			print(found_users_list)
 
@@ -462,8 +595,14 @@ def requests():
 		username = session['username']
 
 		found_user = Users.query.filter_by(username=username).first()
-		friend_requests = found_user.requests.split(',')
-		pending_requests = found_user.pending.split(',')
+		if found_user.requests is not None:
+			friend_requests = found_user.requests.split(',')
+		else:
+			friend_requests = []
+		if found_user.pending is not None:
+			pending_requests = found_user.pending.split(',')
+		else:
+			pending_requests = []
 		friend_requests_pictures = []
 		pending_requests_pictures = []
 
@@ -488,12 +627,18 @@ def requests():
 			if friend_request[1] == "accept":
 				my_user = Users.query.filter_by(username=username).first()
 				my_user.requests = my_user.requests.replace(friend_request[0] + ',', '')
-				my_user.friends += friend_request[0] + ','
+				if my_user.friends is not None:
+					my_user.friends += friend_request[0] + ','
+				else:
+					my_user.friends = friend_request[0] + ','
 				db.session.commit()
 
 				friend_user = Users.query.filter_by(username=friend_request[0]).first()
 				friend_user.pending = friend_user.pending.replace(username + ',', '')
-				friend_user.friends += username + ','
+				if friend_user.friends is not None:
+					friend_user.friends += username + ','
+				else:
+					friend_user.friends = username + ','
 				db.session.commit()
 
 			# remove his name from my requests and my name from his pending
@@ -513,12 +658,15 @@ def requests():
 				db.session.commit()
 
 				friend_user = Users.query.filter_by(username=friend_request[0]).first()
-				friend_user.requests = friend_user.requests.replace(username + ',', '')
+				if friend_user.requests is not None:
+					friend_user.requests = friend_user.requests.replace(username + ',', '')
 				db.session.commit()
 
 			found_user = Users.query.filter_by(username=username).first()
-			friend_requests = found_user.requests.split(',')
-			pending_requests = found_user.pending.split(',')
+			if found_user.requests is not None:
+				friend_requests = found_user.requests.split(',')
+			if found_user.pending is not None:
+				pending_requests = found_user.pending.split(',')
 
 			friend_requests_length = len(friend_requests)
 			pending_requests_length = len(pending_requests)
@@ -527,6 +675,31 @@ def requests():
 
 	else:
 		return redirect(url_for("login"))
+
+
+def check_match(playlist1, playlist2, liked_songs1, liked_songs2):
+	if len(playlist1) == 1 or len(playlist2) == 1:
+		mutual_playlist_percentage = 0
+	else:
+		mutual_songs_in_playlist = 0
+		for song in playlist2:
+			if song in playlist1:
+				mutual_songs_in_playlist += 1
+		mutual_playlist_percentage = mutual_songs_in_playlist/len(playlist1)*100
+
+	if len(liked_songs1) == 1 or len(liked_songs2) == 1:
+		mutual_likes_percentage = 0
+	else:
+		mutual_liked_songs = 0
+		for song in liked_songs2:
+			if song in liked_songs1:
+				mutual_liked_songs += 1
+		mutual_likes_percentage = mutual_liked_songs/len(liked_songs1)*100
+
+	print(mutual_playlist_percentage)
+	print(mutual_likes_percentage)
+
+	return round((mutual_playlist_percentage + mutual_likes_percentage)/2)
 
 
 @socketio.on('connect')
@@ -575,47 +748,99 @@ def handleMessage(msg):
 		emit("liveMessage", full_message, broadcast=True)
 
 
-# @socketio.on('message')
-# def handleRate(msg):
-# 	print(msg)
-# 	username = session['username']
-# 	playlist = os.listdir('D:\Discord Project\static\music')
-# 	all_users = Users.query.all()
-# 	song_likes = 0
-# 	song_dislikes = 0
-#
-# 	if msg.split(',')[0] == "like":
-# 		found_user = Users.query.filter_by(username=username).first()
-# 		found_user.dislikes.replace(msg.split(',')[1] + ',', '')
-# 		found_user.likes += msg.split(',')[1] + ','
-# 		db.session.commit()
-#
-# 	elif msg.split(',')[0] == "dislike":
-# 		found_user = Users.query.filter_by(username=username).first()
-# 		found_user.likes.replace(msg.split(',')[1] + ',', '')
-# 		found_user.dislikes += msg.split(',')[1] + ','
-# 		db.session.commit()
-#
-# 	for user in all_users:
-# 		print(user.likes)
-# 		if user.likes is not None:
-# 			user_likes = user.likes.split(',')
-# 			for liked_song in user_likes:
-# 				if liked_song in playlist:
-# 					song_likes += 1
-# 		print(user.likes)
-# 		if user.dislikes is not None:
-# 			user_dislikes = user.dislikes.split(',')
-# 			for disliked_song in user_dislikes:
-# 				if disliked_song in playlist:
-# 					song_dislikes += 1
-#
-# 	updated_rate = str(song_likes) + "," + str(song_dislikes)
-#
-# 	emit("updateRate", updated_rate, broadcast=True)
+@socketio.on('addSongToPlaylist')
+def addToPlaylist(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	if found_user.my_playlist is None:
+		found_user.my_playlist = song_name + ','
+	else:
+		found_user.my_playlist += song_name + ','
+	db.session.commit()
+
+	print(found_user.my_playlist)
+
+
+@socketio.on('removeSongFromPlaylist')
+def removeFromPlaylist(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	if song_name in found_user.my_playlist:
+		found_user.my_playlist = found_user.my_playlist.replace(song_name + ',', '')
+		db.session.commit()
+	else:
+		pass
+
+	print(found_user.my_playlist)
+
+
+@socketio.on('addSongToLikes')
+def addToLikes(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	if found_user.likes is None:
+		found_user.likes = song_name + ','
+	else:
+		found_user.likes += song_name + ','
+	if found_user.dislikes is not None and song_name in found_user.dislikes:
+		found_user.dislikes = found_user.dislikes.replace(song_name + ",", "")
+	db.session.commit()
+
+	print(found_user.likes)
+	print(found_user.dislikes)
+
+
+@socketio.on('removeSongFromLikes')
+def removeFromLikes(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	found_user.likes = found_user.likes.replace(song_name + ",", "")
+	db.session.commit()
+
+	print(found_user.likes)
+	print(found_user.dislikes)
+
+
+@socketio.on('addSongToDislikes')
+def addToDislikes(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	if found_user.dislikes is None:
+		found_user.dislikes = song_name + ','
+	else:
+		found_user.dislikes += song_name + ','
+
+	if found_user.likes is not None and song_name in found_user.likes:
+		found_user.likes = found_user.likes.replace(song_name + ",", "")
+	db.session.commit()
+
+	print(found_user.likes)
+	print(found_user.dislikes)
+
+
+@socketio.on('removeSongFromDislikes')
+def removeFromDislikes(song_name):
+
+	username = session['username']
+	found_user = Users.query.filter_by(username=username).first()
+
+	found_user.dislikes = found_user.dislikes.replace(song_name + ",", "")
+	db.session.commit()
+
+	print(found_user.likes)
+	print(found_user.dislikes)
 
 
 if __name__ == '__main__':
 	db.create_all()
-	#app.run(host='127.0.0.1', port=8080)
-	socketio.run(app, host='127.0.0.1', port='5000', debug=True)
+	socketio.run(app, host="0.0.0.0", port='5000', debug=True)

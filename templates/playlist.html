@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}New Music{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+
+<div class="jumbotron">
+	<div style="float:left; width:1280px; display:block; margin-right:80px">
+		<video autoplay controls width="1280" height="720" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+			<source src='/static/music/{{song}}.mp4' type="video/mp4">
+		</video>
+		<h2 id="songName">{{song}}</h2>
+		{% if song in playlist %}
+			<button style="border: none; background-color: Transparent" type="button" onclick="onAdd()">
+				<img src={{url_for("static", filename="images/RedRemove.png")}} width="25" height="25" id="add">
+			</button>
+			<span id="addText">Remove From Playlist</span>
+		{% else %}
+			<span class="text-danger">The Song Was Successfully Removed From The Playlist</span>
+		{% endif %}
+	</div>
+
+	<h1 style="text-align:center">My Playlist</h1>
+	<div class="card border-primary mb-3" style="float:right width:500px; height:770px">
+		<div class="card-body" style="overflow-y: scroll;">
+			{% for song in playlist %}
+				{% if song != "" %}
+					<video autoplay muted width="120" height="67.5" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+						<source src='/static/music/{{song}}.mp4' type="video/mp4">
+					</video>
+					<br>
+					<a href="/playlist/{{song.split('.mp4')[0]}}">{{song.split('.mp4')[0]}}</a>
+					<br>
+				{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+<script>
+	var socket = io('http://' + document.domain + ':' + location.port);
+
+	socket.on('connect', function() {
+    console.log("Connected!");
+	});
+
+	socket.on('disconnect', function() {
+    console.log("Disconnected!");
+	});
+
+	function onAdd()
+	{
+		var addButton = document.getElementById("add");
+		var addText = document.getElementById("addText");
+		var songName = document.getElementById("songName");
+
+		socket.emit("removeSongFromPlaylist", songName.textContent);
+
+		location.reload();
+		location.reload();
+	}
+</script>
+{% endblock %}

@@ -16,7 +16,7 @@
 		<br><br><br><br><br>
 		<h1 style="text-align:center">No users found... please try again</h1>
 	{% else %}
-		{% for user,picture,date,situation in found_users_list %}
+		{% for user,picture,date,mutual_friends,matching_percentage,situation in found_users_list %}
 			{% if situation == "Add" %}
 				<div class="list-group" style="display:inline-block; text-align:center; width:250px; z-index:1">
 					<a class="list-group-item list-group-item-action active" style="text-align:center; font-size:25px">
@@ -30,14 +30,19 @@
 						{% endif %}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						DISROG Member Since {{date}}
+						<span style="color:black">DISROG Member Since: </span>{{date}}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						Mutual Friends
+						<span style="color:black">Mutual Friends:</span>
+						<br>
+						{{mutual_friends}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<span style="color:black">Matching Percentage: </span>{{matching_percentage}}%
 					</a>
 					<a class="list-group-item list-group-item-action">
 						<form action="" method="POST">
-							<button type="submit" class="btn btn-outline-success" >Add Friend</button>
+							<button type="submit" class="btn btn-outline-success" >{{situation}}</button>
 							<input type="text" class="form-control" value={{user}},{{situation}} name=friend style="display:none">
 						</form>
 					</a>
@@ -57,10 +62,15 @@
 						{% endif %}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						DISROG Member Since {{date}}
+						<span style="color:black">DISROG Member Since: </span>{{date}}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						Mutual Friends
+						<span style="color:black">Mutual Friends:</span>
+						<br>
+						{{mutual_friends}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<span style="color:black">Matching Percentage: </span>{{matching_percentage}}%
 					</a>
 					<a class="list-group-item list-group-item-action">
 						<form action="" method="POST">
@@ -84,10 +94,15 @@
 						{% endif %}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						DISROG Member Since {{date}}
+						<span style="color:black">DISROG Member Since: </span>{{date}}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						Mutual Friends
+						<span style="color:black">Mutual Friends:</span>
+						<br>
+						{{mutual_friends}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<span style="color:black">Matching Percentage: </span>{{matching_percentage}}%
 					</a>
 					<a class="list-group-item list-group-item-action" style="text-align:center">
 						<button type="submit" class="btn btn-success disabled">{{situation}}</button>
@@ -108,10 +123,15 @@
 						{% endif %}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						DISROG Member Since {{date}}
+						<span style="color:black">DISROG Member Since: </span>{{date}}
 					</a>
 					<a class="list-group-item list-group-item-action">
-						Mutual Friends
+						<span style="color:black">Mutual Friends:</span>
+						<br>
+						{{mutual_friends}}
+					</a>
+					<a class="list-group-item list-group-item-action">
+						<span style="color:black">Matching Percentage: </span>{{matching_percentage}}%
 					</a>
 					<a class="list-group-item list-group-item-action" style="text-align:center">
 						<button type="submit" class="btn btn-success disabled">{{situation}}</button>

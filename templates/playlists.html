@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}New Music{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+{% block content %}
+
+<div class="jumbotron">
+	<div style="display:flex; margin-bottom:10px">
+		{% if first_song == "" %}
+			<button type="button" class="badge rounded-pill bg-success" style="font-size:25px; border:none; margin-left: 25px">&nbsp;Play&nbsp;</button>
+		{% else %}
+			<a href="/playlist/{{first_song.split('.mp4')[0]}}">
+				<button type="button" class="badge rounded-pill bg-success" style="font-size:25px; border:none; margin-left: 25px">&nbsp;Play&nbsp;</button>
+			</a>
+		{% endif %}
+		<h1>&nbsp; My Playlist &nbsp;</h1>
+		<span style="margin-top:15px">{{playlist_length}} songs</span>
+	</div>
+
+	<div class="card border-primary mb-3">
+		<div class="card-body" style="overflow-y:scroll; height:750px">
+			{% for song in playlist %}
+				{% if song != "" %}
+					<div>
+						<video autoplay muted width="120" height="67.5" onloadstart="this.volume=0.1" style="background-image: url('/static/black.jpg')">
+							<source src='/static/music/{{song}}.mp4' type="video/mp4">
+						</video>
+						<a href="/playlist/{{song.split('.mp4')[0]}}" style="font-size:25px">{{song.split('.mp4')[0]}}</a>
+						<br>
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

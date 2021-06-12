@@ -46,7 +46,7 @@
 
 	<div id="myTabContent" class="tab-content">
 		<div class="tab-pane fade active show" id="newTab">
-			{% if friend_requests_length == 1 %}
+			{% if friend_requests_length == 1 or friend_requests_length == 0 %}
 				<br>
 				<br>
 				<br>
@@ -87,7 +87,7 @@
 		</div>
 
 		<div class="tab-pane fade" id="pendingTab">
-			{% if pending_requests_length == 1 %}
+			{% if pending_requests_length == 1 or pending_requests_length == 0 %}
 				<br>
 				<br>
 				<br>

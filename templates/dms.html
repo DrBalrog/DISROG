@@ -32,7 +32,9 @@ if ( window.history.replaceState ) {
 					<img src={{url_for("static", filename=friend_picture)}} height="100" width="100">
 				{% endif %}
 				<br><br>
+				<p class="card-text"><span style="color: black">DISROG Member Since: </span>{{friend_date}}</p>
 				<p class="card-text"><span style="color: black">Mutual Friends: </span>{{mutual_friends}}</p>
+				<p class="card-text"><span style="color: black">Matching Percentage: </span>{{matching_percentage}}%</p>
 			</div>
 		</div>
 	</center>
